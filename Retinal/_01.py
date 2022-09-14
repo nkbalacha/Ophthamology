@@ -5,7 +5,8 @@ import toml
 from glob2 import glob
 from tqdm import tqdm
 
-
+def main():
+    print("Hello")
 
 if __name__ == '__main__':
 
