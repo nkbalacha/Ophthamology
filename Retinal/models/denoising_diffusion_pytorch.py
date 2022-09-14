@@ -1,3 +1,4 @@
+#Source Code: https://github.com/lucidrains/denoising-diffusion-pytorch/blob/main/denoising_diffusion_pytorch/denoising_diffusion_pytorch.py
 import math
 import copy
 from pathlib import Path
@@ -19,7 +20,7 @@ from einops.layers.torch import Rearrange
 
 from PIL import Image
 from tqdm.auto import tqdm
-from ema_pytorch import EMA
+from utils.ema_pytorch import EMA
 
 from accelerate import Accelerator
 
