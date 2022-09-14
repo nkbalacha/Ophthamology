@@ -1,1 +1,14 @@
+[GLOBAL_PROJECT]
+_PROJECT_NAME = "Retinal"
+_CODE_DIR = '/home/nitin/pytorch/code/'
+_DATA_DIR = '/home/varatha2/pytorch/data'
+
+
+[GLOBAL_COMPUTE]
+# FIXME: CAUTION: watch peak memory usage in a trial run and set accordingly. # processes = number of physical cores may crash due to insufficient memory. Risky to utilize more than 70% system memory. Each process will use memory proportional to the size of the raw/preprocessed recording.
+# CAUTION: threading + multiprocessing is not a good idea! Keep _N_THREADS=1 if _N_PROCESSES is high
+_N_THREADS = 1
+_N_PROCESSES = 18
+
+[_01]
 _INDEX_LOGFILE = '/home/nitin/pytorch/logs/_01.log'
