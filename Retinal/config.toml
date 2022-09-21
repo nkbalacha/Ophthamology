@@ -3,6 +3,7 @@ _PROJECT_NAME = "Retinal"
 _CODE_DIR = '/home/nitin/pytorch/code/'
 _DATA_DIR = '/home/varatha2/pytorch/data'
 _KAGGLE_DATA_DIR = '/home/nitin/data/resized_train_cropped/resized_train_cropped'
+_KAGGLE_LABEL_DIR = '/home/nitin/data/trainLabels_cropped.csv'
 _RESULTS_DIR = '/home/nitin/pytorch/results'
 
 
