@@ -17,13 +17,7 @@ from torchvision.utils import make_grid
 from torch.utils.data import DataLoader
 import imageio
 
-transform = transforms.Compose([
-                transforms.ToTensor(),
-                transforms.Normalize((0.5,),(0.5,))
-                ])
-to_image = transforms.ToPILImage()
-#trainset = MNIST(root='./data/', train=True, download=True, transform=transform)
-#trainloader = DataLoader(trainset, batch_size=100, shuffle=True)
+
 
 device = 'cuda'
 
@@ -31,7 +25,7 @@ class Generator(nn.Module):
     def __init__(self):
         super(Generator, self).__init__()
         self.n_features = 128
-        self.n_out = 128*128
+        self.n_out = 128*128*3
         self.fc0 = nn.Sequential(
                     nn.Linear(self.n_features, 256),
                     nn.LeakyReLU(0.2)
@@ -53,13 +47,13 @@ class Generator(nn.Module):
         x = self.fc1(x)
         x = self.fc2(x)
         x = self.fc3(x)
-        x = x.view(-1, 1, 128, 128)
+        x = x.view(-1, 3, 128, 128)
         return x
 
 class Discriminator(nn.Module):
     def __init__(self):
         super(Discriminator, self).__init__()
-        self.n_in = 128*128
+        self.n_in = 128*128*3
         self.n_out = 1
         self.fc0 = nn.Sequential(
                     nn.Linear(self.n_in, 1024),
@@ -81,25 +75,13 @@ class Discriminator(nn.Module):
                     nn.Sigmoid()
                     )
     def forward(self, x):
-        x = x.view(-1, 128*128)
+        x = x.view(-1, 3*128*128)
         x = self.fc0(x)
         x = self.fc1(x)
         x = self.fc2(x)
         x = self.fc3(x)
         return x
 
-generator = Generator()
-discriminator = Discriminator()
-
-generator.to(device)
-discriminator.to(device)
-
-g_optim = optim.Adam(generator.parameters(), lr=2e-4)
-d_optim = optim.Adam(discriminator.parameters(), lr=2e-4)
-
-g_losses = []
-d_losses = []
-images = []
 
 criterion = nn.BCELoss()
 
@@ -114,16 +96,17 @@ def make_zeros(size):
     data = Variable(torch.zeros(size, 1))
     return data.to(device)
 
-def train_discriminator(optimizer, real_data, fake_data):
+def train_discriminator(optimizer, real_data, fake_data,dis):
     n = real_data.size(0)
 
     optimizer.zero_grad()
     
-    prediction_real = discriminator(real_data)
+    prediction_real = dis(real_data)
+
     error_real = criterion(prediction_real, make_ones(n))
     error_real.backward()
 
-    prediction_fake = discriminator(fake_data)
+    prediction_fake = dis(fake_data)
     error_fake = criterion(prediction_fake, make_zeros(n))
     
     error_fake.backward()
@@ -131,11 +114,11 @@ def train_discriminator(optimizer, real_data, fake_data):
     
     return error_real + error_fake
 
-def train_generator(optimizer, fake_data):
+def train_generator(optimizer, fake_data,dis):
     n = fake_data.size(0)
     optimizer.zero_grad()
     
-    prediction = discriminator(fake_data)
+    prediction = dis(fake_data)
     error = criterion(prediction, make_ones(n))
     
     error.backward()
@@ -143,12 +126,6 @@ def train_generator(optimizer, fake_data):
     
     return error
 
-num_epochs = 250
-k = 1
-test_noise = noise(64)
-
-generator.train()
-discriminator.train()
 
 
 

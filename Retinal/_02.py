@@ -8,6 +8,7 @@ Original file is located at
 """
 
 import sys
+import math
 import toml
 import logging
 import os
@@ -20,6 +21,7 @@ from torchvision.datasets import MNIST
 from torchvision.utils import make_grid
 from torch.utils.data import DataLoader,Dataset
 from torchvision.io import read_image
+from torchvision import transforms as T, utils
 from models.vanilla_gan import Generator, Discriminator,noise,train_generator,train_discriminator
 import imageio
 import numpy as np
@@ -29,13 +31,13 @@ from matplotlib import pyplot as plt
 
 
 def main():
-    batch_size = 128
+    batch_size = 512
     transform = transforms.Compose([
                 transforms.ToPILImage(),
-                transforms.Grayscale(),
+                #transforms.Grayscale(),
                 transforms.Resize((128,128)),
                 transforms.ToTensor(),
-                transforms.Normalize((0.5,),(0.5,))
+                transforms.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5))
                 ])
     to_image = transforms.ToPILImage()
     class Kaggle_Dataset(Dataset):
@@ -74,12 +76,12 @@ def main():
 
     criterion = nn.BCELoss()
 
-    num_epochs = 10
+    num_epochs = 250
     k = 1
-    test_noise = noise(batch_size)
+    test_noise = noise(64)
 
-    generator.train()
-    discriminator.train()
+    #generator.train()
+    #discriminator.train()
     for epoch in range(num_epochs):
         g_error = 0.0
         d_error = 0.0
@@ -89,30 +91,33 @@ def main():
             for j in range(k):
                 fake_data = generator(noise(n)).detach()
                 real_data = imgs.to(device)
-                d_error += train_discriminator(d_optim, real_data, fake_data)
+                d_error += train_discriminator(d_optim, real_data, fake_data,discriminator)
             fake_data = generator(noise(n))
-            g_error += train_generator(g_optim, fake_data)
+            g_error += train_generator(g_optim, fake_data,discriminator)
 
-        #img = generator(test_noise).cpu().detach()       
-        img = (.5*generator(test_noise)+.5).cpu().detach()
+        img = generator(test_noise).cpu().detach()       
+        #img = (.5*generator(test_noise)+.5).cpu().detach()
         img = make_grid(img)
+        utils.save_image(img, _OUTPUT_DIR+str('_02.png'), nrow = int(math.sqrt(64)))
         images.append(img)
-        g_losses.append(g_error/i)
-        d_losses.append(d_error/i)
+        g_losses.append(g_error.cpu().detach().numpy()/i)
+        d_losses.append(d_error.cpu().detach().numpy()/i)
         print('Epoch {}: g_loss: {:.8f} d_loss: {:.8f}\r'.format(epoch, g_error/i, d_error/i))
-    
+        imgs = [np.array(to_image(i).convert("RGB")) for i in images]
+        imageio.mimsave(_OUTPUT_DIR+'progress_kaggle.gif', imgs)
+        torch.save(generator.state_dict(), _OUTPUT_DIR+'kaggle_generator.pth')
     print('Training Finished')
-    torch.save(generator.state_dict(), 'mnist_generator.pth')
+    torch.save(generator.state_dict(), _OUTPUT_DIR+'kaggle_generator.pth')
 
     #imgs = [np.array(to_image(i)) for i in images]
     imgs = [np.array(to_image(i).convert("RGB")) for i in images]
 
-    imageio.mimsave('progress.gif', imgs)
+    imageio.mimsave('progress_kaggle.gif', imgs)
 
     plt.plot(g_losses, label='Generator_Losses')
     plt.plot(d_losses, label='Discriminator Losses')
     plt.legend()
-    plt.savefig('loss.png')
+    plt.savefig('kaggle_loss.png')
 
 
 if __name__ == '__main__':
