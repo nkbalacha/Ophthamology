@@ -2,3 +2,6 @@
 *.png
 *.gif
 *.pth
+*.jpeg
+*.png
+*.pyc
