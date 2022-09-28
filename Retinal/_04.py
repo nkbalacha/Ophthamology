@@ -1,22 +1,15 @@
-"""
--------------------------------------------------
-   File Name:    train.py
-   Author:       Zhonghao Huang
-   Date:         2019/10/18
-   Description:
--------------------------------------------------
-"""
-#Code from https://github.com/huangzh13/StyleGAN.pytorch/blob/master/train.py
+
+#Code  modified from https://github.com/huangzh13/StyleGAN.pytorch/blob/master/train.py
 
 import argparse
 import os
 import shutil
-
+import toml
 import torch
 from torch.backends import cudnn
 
-from data import make_dataset
-from models.GAN import StyleGAN
+from data_handler import make_dataset
+from stylegan_folder.styleGAN import StyleGAN
 from utils import (copy_files_and_create_dirs,
                    list_dir_recursively_with_ignore, make_logger)
 
@@ -32,7 +25,7 @@ def load(model, cpk_file):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="StyleGAN pytorch implementation.")
-    parser.add_argument('--config', default='./configs/sample.yaml')
+    parser.add_argument('--config', default='./sample.yaml')
     
     parser.add_argument("--start_depth", action="store", type=int, default=0,
                         help="Starting depth for training the network")

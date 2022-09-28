@@ -9,6 +9,7 @@
                  https://github.com/NVlabs/stylegan
 -------------------------------------------------
 """
+#Code from https://github.com/huangzh13/StyleGAN.pytorch/blob/master/train.py
 
 import copy
 import datetime
@@ -22,15 +23,15 @@ from collections import OrderedDict
 import numpy as np
 import torch
 import torch.nn as nn
-from data import get_data_loader
+from data_handler import get_data_loader
 from torch.nn.functional import interpolate
 from torch.nn.modules.sparse import Embedding
 
-import models.Losses as Losses
-from models import update_average
-from models.Blocks import (DiscriminatorBlock, DiscriminatorTop,
+import stylegan_folder.losses as Losses
+from stylegan_folder import update_average
+from stylegan_folder.blocks import (DiscriminatorBlock, DiscriminatorTop,
                            GSynthesisBlock, InputBlock)
-from models.CustomLayers import (EqualizedConv2d, EqualizedLinear,
+from stylegan_folder.custom_layer import (EqualizedConv2d, EqualizedLinear,
                                  PixelNormLayer, Truncation)
 
 

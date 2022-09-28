@@ -1,0 +1,10 @@
+
+
+_OUTPUT_DIR =  '/home/nitin/pytorch/stylegan_results'
+_STRUCTURE ='linear'
+_DEVICE_ID = ('0')
+_BATCH_SIZE=256
+_IMG_DIR='/home/nitin/data/resized_train_cropped/resized_train_cropped'
+_FOLDER =False
+_RESOLUTION = 128
+_EPOCHS =[2,4,4,4,4,8]
