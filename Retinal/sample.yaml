@@ -1,0 +1,11 @@
+# Config file for CelebA dataset (200k)
+
+output_dir: '/home/nitin/pytorch/stylegan_results'
+structure: 'linear'
+device_id: ('0')
+dataset:
+  img_dir: '/home/nitin/data/resized_train_cropped/resized_train_cropped'
+  folder: False
+  resolution: 128
+sched:
+  epochs: [2,4,4,4,4,8]

@@ -24,27 +24,27 @@ class Generator(nn.Module):
         self.ngf = 32
         self.nz = 128
         # Input is the latent vector Z.
-        self.tconv1 = nn.ConvTranspose2d(self.nz, self.ngf*8,
+        self.tconv1 = nn.ConvTranspose2d(self.nz, self.ngf*16,
             kernel_size=4, stride=1, padding=0, bias=False)
-        self.bn1 = nn.BatchNorm2d(self.ngf*8)
+        self.bn1 = nn.BatchNorm2d(self.ngf*16)
 
         # Input Dimension: (ngf*8) x 4 x 4
-        self.tconv2 = nn.ConvTranspose2d(self.ngf*8, self.ngf*4,
+        self.tconv2 = nn.ConvTranspose2d(self.ngf*16, self.ngf*8,
             4, 2, 1, bias=False)
-        self.bn2 = nn.BatchNorm2d(self.ngf*4)
+        self.bn2 = nn.BatchNorm2d(self.ngf*8)
 
         # Input Dimension: (ngf*4) x 8 x 8
-        self.tconv3 = nn.ConvTranspose2d(self.ngf*4, self.ngf*2,
+        self.tconv3 = nn.ConvTranspose2d(self.ngf*8, self.ngf*4,
             4, 2, 1, bias=False)
-        self.bn3 = nn.BatchNorm2d(self.ngf*2)
+        self.bn3 = nn.BatchNorm2d(self.ngf*4)
 
         # Input Dimension: (ngf*2) x 16 x 16
-        self.tconv4 = nn.ConvTranspose2d(self.ngf*2, self.ngf,
+        self.tconv4 = nn.ConvTranspose2d(self.ngf*4, self.ngf*2,
             4, 2, 1, bias=False)
-        self.bn4 = nn.BatchNorm2d(self.ngf)
+        self.bn4 = nn.BatchNorm2d(self.ngf*2)
 
         # Input Dimension: (ngf) * 32 * 32
-        self.tconv5 = nn.ConvTranspose2d(self.ngf, self.ngf,
+        self.tconv5 = nn.ConvTranspose2d(self.ngf*2, self.ngf,
             4, 2, 1, bias=False)
         self.bn5 = nn.BatchNorm2d(self.ngf)
 
@@ -68,33 +68,33 @@ class Discriminator(nn.Module):
     def __init__(self):
         super().__init__()
         self.n_c =3
-        self.ndf = 32
+        self.ndf = 8
         # Input Dimension: (nc) x 128 x 128
         self.conv1 = nn.Conv2d(self.n_c, self.ndf,
             4, 2, 1, bias=False)
 
         # Input Dimension: (ndf) x 64 x 64
-        self.conv2 = nn.Conv2d(self.ndf, self.ndf,
+        self.conv2 = nn.Conv2d(self.ndf, self.ndf*2,
             4, 2, 1, bias=False)
-        self.bn2 = nn.BatchNorm2d(self.ndf)
+        self.bn2 = nn.BatchNorm2d(self.ndf*2)
 
         # Input Dimension: (ndf) x 32 x 32
-        self.conv3 = nn.Conv2d(self.ndf, self.ndf*2,
+        self.conv3 = nn.Conv2d(self.ndf*2, self.ndf*4,
             4, 2, 1, bias=False)
-        self.bn3 = nn.BatchNorm2d(self.ndf*2)
+        self.bn3 = nn.BatchNorm2d(self.ndf*4)
 
         # Input Dimension: (ndf*2) x 16 x 16
-        self.conv4 = nn.Conv2d(self.ndf*2, self.ndf*4,
+        self.conv4 = nn.Conv2d(self.ndf*4, self.ndf*8,
             4, 2, 1, bias=False)
-        self.bn4 = nn.BatchNorm2d(self.ndf*4)
+        self.bn4 = nn.BatchNorm2d(self.ndf*8)
 
         # Input Dimension: (ndf*4) x 8 x 8
-        self.conv5 = nn.Conv2d(self.ndf*4, self.ndf*8,
+        self.conv5 = nn.Conv2d(self.ndf*8, self.ndf*16,
             4, 2, 1, bias=False)
-        self.bn5 = nn.BatchNorm2d(self.ndf*8)
+        self.bn5 = nn.BatchNorm2d(self.ndf*16)
 
         # Input Dimension: (ndf*8) x 4 x 4
-        self.conv6 = nn.Conv2d(self.ndf*8, 1, 4, 1, 0, bias=False)
+        self.conv6 = nn.Conv2d(self.ndf*16, 1, 4, 1, 0, bias=False)
 
     def forward(self, x):
         x = F.leaky_relu(self.conv1(x), 0.2, True)
