@@ -1,0 +1,36 @@
+from typing import Optional, List
+from pydantic import StrictStr, StrictInt, StrictFloat, StrictBool
+from tensorfn.config import (
+    MainConfig,
+    Config,
+    Optimizer,
+    Scheduler,
+    DataLoader,
+    Instance,
+)
+import diff_folder.diffusion
+import diff_folder.model
+
+
+class Diffusion(Config):
+    beta_schedule: Instance
+
+
+class Training(Config):
+    n_iter: StrictInt
+    optimizer: Optimizer
+    scheduler: Optional[Scheduler]
+    dataloader: DataLoader
+
+
+class Eval(Config):
+    wandb: StrictBool
+    save_every: StrictInt
+    valid_every: StrictInt
+    log_every: StrictInt
+
+class DiffusionConfig(MainConfig):
+    model: Instance
+    diffusion: Diffusion
+    training: Training
+    evaluate: Eval

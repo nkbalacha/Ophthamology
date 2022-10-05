@@ -68,7 +68,7 @@ class Discriminator(nn.Module):
     def __init__(self):
         super().__init__()
         self.n_c =3
-        self.ndf = 8
+        self.ndf = 12
         # Input Dimension: (nc) x 128 x 128
         self.conv1 = nn.Conv2d(self.n_c, self.ndf,
             4, 2, 1, bias=False)
