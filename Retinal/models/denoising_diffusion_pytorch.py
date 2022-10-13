@@ -708,11 +708,12 @@ class Dataset(Dataset):
         maybe_convert_fn = partial(convert_image_to, convert_image_to) if exists(convert_image_to) else nn.Identity()
 
         self.transform = T.Compose([
-            T.Lambda(maybe_convert_fn),
+            #T.Lambda(maybe_convert_fn),
             T.Resize(image_size),
             T.RandomHorizontalFlip() if augment_horizontal_flip else nn.Identity(),
             T.CenterCrop(image_size),
             T.ToTensor()
+            #T.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5))
         ])
 
     def __len__(self):
