@@ -31,7 +31,7 @@ from matplotlib import pyplot as plt
 
 
 def main():
-    batch_size = 512
+    batch_size = 128
     transform = transforms.Compose([
                 transforms.ToPILImage(),
                 #transforms.Grayscale(),
@@ -51,7 +51,7 @@ def main():
             return len(self.img_labels)
 
         def __getitem__(self, idx):
-            img_path = os.path.join(self.img_dir, str(self.img_labels.iloc[idx, 2])+".jpeg")
+            img_path = os.path.join(self.img_dir, str(self.img_labels.iloc[idx, 0]))
             image = read_image(img_path)
             label = self.img_labels.iloc[idx, 1]
             if self.transform:
@@ -69,7 +69,7 @@ def main():
     dataset = Long_Dataset(annotations_file = _LONG_LABEL_DIR,img_dir =_LONG_DATA_DIR, transform = transform)
     train_size = int(0.8 * len(dataset))
     test_size = len(dataset) - train_size
-    trainset, testset = torch.utils.data.random_split(full_dataset, [train_size, test_size])
+    trainset, testset = torch.utils.data.random_split(dataset, [train_size, test_size])
     trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=True)
     trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=True)
     testloader = DataLoader(testset, batch_size=batch_size, shuffle=True)
@@ -92,28 +92,58 @@ def main():
         for i, data in enumerate(trainloader, 0):
             # get the inputs; data is a list of [inputs, labels]
             inputs, labels = data
-
+            new_labels = torch.zeros((len(labels),10))
+            for j in range(0,len(labels)):
+                age = labels[j]
+                if age <=45: 
+                    new_labels[j][0] = 1
+                if 45<age <= 50:
+                    new_labels[j][1] = 1
+                if 50<age <= 55:
+                    new_labels[j][2] = 1
+                if 55<age <= 60:
+                    new_labels[j][3] = 1
+                if 60<age <= 65:
+                    new_labels[j][4] = 1
+                if 65<age <= 70:
+                    new_labels[j][5] = 1
+                if 70<age <= 75:
+                    new_labels[j][6] = 1
+                if 75<age <= 80:
+                    new_labels[j][7] = 1
+                if 80<age <= 85:
+                    new_labels[j][8] = 1
+                if 85<age:
+                    new_labels[j][9] = 1
+                
+            
             # zero the parameter gradients
             opt.zero_grad()
 
             # forward + backward + optimize
-            outputs = model(inputs)
-            loss = criterion(outputs, labels)
+            outputs = model(inputs.to(device))
+
+            loss = criterion(outputs, new_labels.to(device))
+            #print("labels",labels.shape)
+            #print("outputs",outputs.shape)
+            #loss = criterion(torch.flatten(outputs).type(torch.FloatTensor),labels.type(torch.FloatTensor))
             loss.backward()
-            optimizer.step()
+            opt.step()
 
             # print statistics
             running_loss += loss.item()
-            if i % 2000 == 1999:    # print every 2000 mini-batches
-                print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 2000:.3f}')
+            if i % 500 == 499:    # print every 2000 mini-batches
+                print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 500:.3f}')
                 running_loss = 0.0
+        print(epoch)
 
     PATH = './age_prediction.pth'
-    torch.save(net.state_dict(), PATH)
+    torch.save(model.state_dict(), PATH)
     print('Finished Training')
 
     net = Net()
     net.load_state_dict(torch.load(PATH))
+    net.to(device)
 
     correct = 0
     total = 0
@@ -122,11 +152,41 @@ def main():
         for data in testloader:
             images, labels = data
             # calculate outputs by running images through the network
-            outputs = net(images)
+            outputs = net(images.to(device))
+            new_labels = torch.zeros((len(labels),10))
+            for j in range(0,len(labels)):
+                age = labels[j]
+                if age <=45: 
+                    new_labels[j][0] = 1
+                if 45<age <= 50:
+                    new_labels[j][1] = 1
+                if 50<age <= 55:
+                    new_labels[j][2] = 1
+                if 55<age <= 60:
+                    new_labels[j][3] = 1
+                if 60<age <= 65:
+                    new_labels[j][4] = 1
+                if 65<age <= 70:
+                    new_labels[j][5] = 1
+                if 70<age <= 75:
+                    new_labels[j][6] = 1
+                if 75<age <= 80:
+                    new_labels[j][7] = 1
+                if 80<age <= 85:
+                    new_labels[j][8] = 1
+                if 85<age:
+                    new_labels[j][9] = 1
             # the class with the highest energy is what we choose as prediction
             _, predicted = torch.max(outputs.data, 1)
+            _, labels_idx = torch.max(new_labels.data,1)
             total += labels.size(0)
-            correct += (predicted == labels).sum().item()
+            #print(new_labels.shape)
+            #print(outputs.shape)
+            #print(predicted.shape)
+            #print(predicted)
+            #print(torch.max(new_labels.data,1))
+            correct += (predicted.to(device) == labels_idx.to(device)).sum().item()
+            #correct += (predicted.to(device) == new_labels.to(device)).sum().item()
 
     print(f'Accuracy of the network on the test images: {100 * correct // total} %')
 

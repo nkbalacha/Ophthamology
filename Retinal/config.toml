@@ -8,6 +8,9 @@ _RESULTS_DIR = '/home/nitin/pytorch/results'
 _RESULTS_DIFF_DIR = '/home/nitin/pytorch/results/diff'
 _OUTPUT_DIR = '/home/nitin/pytorch/results/'
 
+_LONG_DATA_DIR = '/home/nitin/Long_data/mod_FundusImages'
+_LONG_LABEL_DIR = '/home/nitin/Long_data/mod_Patients.csv'
+
 
 [GLOBAL_COMPUTE]
 # FIXME: CAUTION: watch peak memory usage in a trial run and set accordingly. # processes = number of physical cores may crash due to insufficient memory. Risky to utilize more than 70% system memory. Each process will use memory proportional to the size of the raw/preprocessed recording.
